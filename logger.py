@@ -42,8 +42,4 @@ def index():
     with open("ip_log.txt", "a") as f:
         f.write(log_entry)
 
-    return "Hello! Your info has been logged."
-
-if __name__ == '__main__':
-    port = int(os.environ.get("PORT", 5000))
-    app.run(host='0.0.0.0', port=port)
+    return "Шо ты голова."
