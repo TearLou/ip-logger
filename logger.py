@@ -1,0 +1,49 @@
+from flask import Flask, request
+from datetime import datetime
+import os
+
+app = Flask(__name__)
+
+def detect_device_type(user_agent):
+    ua = user_agent.lower()
+    if any(mobile in ua for mobile in ['mobile', 'android', 'iphone', 'ipad', 'tablet']):
+        if 'tablet' in ua or 'ipad' in ua:
+            return 'Tablet'
+        else:
+            return 'Mobile'
+    return 'Desktop'
+
+@app.route('/')
+def index():
+    x_forwarded_for = request.headers.get('X-Forwarded-For')
+    if x_forwarded_for:
+        visitor_ip = x_forwarded_for.split(',')[0].strip()
+    else:
+        visitor_ip = request.remote_addr
+
+    user_agent = request.headers.get('User-Agent', 'Unknown')
+    referer = request.headers.get('Referer', 'None')
+    cookies = request.headers.get('Cookie', 'None')
+    access_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+    device_type = detect_device_type(user_agent)
+
+    log_entry = (
+        f"Time: {access_time}\n"
+        f"IP: {visitor_ip}\n"
+        f"Device Type: {device_type}\n"
+        f"User-Agent: {user_agent}\n"
+        f"Referer: {referer}\n"
+        f"Cookies: {cookies}\n"
+        f"X-Forwarded-For: {x_forwarded_for if x_forwarded_for else 'None'}\n\n"
+    )
+
+    print(log_entry)
+
+    with open("ip_log.txt", "a") as f:
+        f.write(log_entry)
+
+    return "Hello! Your info has been logged."
+
+if __name__ == '__main__':
+    port = int(os.environ.get("PORT", 5000))
+    app.run(host='0.0.0.0', port=port)
