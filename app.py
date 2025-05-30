@@ -1,9 +1,18 @@
 from flask import Flask, request
 from datetime import datetime
 import os
+import requests
 
 app = Flask(__name__)
 
+import requests
+
+def check_ip_details(ip):
+    api_key = 'YOUR_API_KEY'
+    url = f'https://ipqualityscore.com/api/json/ip/{api_key}/{ip}'
+    response = requests.get(url)
+    return response.json()
+    
 def detect_device_type(user_agent):
     ua = user_agent.lower()
     if any(mobile in ua for mobile in ['mobile', 'android', 'iphone', 'ipad', 'tablet']):
