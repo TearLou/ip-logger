@@ -10,14 +10,13 @@ def check_ip_details(ip):
     url = f'https://ipqualityscore.com/api/json/ip/{api_key}/{ip}'
     response = requests.get(url)
     return response.json()
-    
+
 def detect_device_type(user_agent):
     ua = user_agent.lower()
-    if any(mobile in ua for mobile in ['mobile', 'android', 'iphone', 'ipad', 'tablet']):
-        if 'tablet' in ua or 'ipad' in ua:
-            return 'Tablet'
-        else:
-            return 'Mobile'
+    if 'tablet' in ua or 'ipad' in ua:
+        return 'Tablet'
+    elif 'mobile' in ua or 'android' in ua or 'iphone' in ua:
+        return 'Mobile'
     return 'Desktop'
 
 @app.route('/')
