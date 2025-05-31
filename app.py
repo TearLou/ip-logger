@@ -36,11 +36,10 @@ def index():
     access_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
     device_type = detect_device_type(user_agent)
 
-ip_info = check_ip_details(visitor_ip)
-
-vpn_status = ip_info.get("vpn", "unknown")
-proxy_status = ip_info.get("proxy", "unknown")
-tor_status = ip_info.get("tor", "unknown")
+    ip_info = check_ip_details(visitor_ip)
+    vpn_status = ip_info.get("vpn", "unknown")
+    proxy_status = ip_info.get("proxy", "unknown")
+    tor_status = ip_info.get("tor", "unknown")
 
     log_entry = (
         f"Time: {access_time}\n"
@@ -52,7 +51,8 @@ tor_status = ip_info.get("tor", "unknown")
         f"User-Agent: {user_agent}\n"
         f"Referer: {referer}\n"
         f"Cookies: {cookies}\n"
-        f"X-Forwarded-For: {x_forwarded_for if x_forwarded_for else 'None'}\n\n"    )
+        f"X-Forwarded-For: {x_forwarded_for if x_forwarded_for else 'None'}\n\n"
+    )
 
     print(log_entry)
 
