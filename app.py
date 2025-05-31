@@ -1,9 +1,13 @@
 from flask import Flask, request
 from datetime import datetime
-import os
+import pytz
 import requests
+import os
 
 app = Flask(__name__)
+
+moscow_tz = pytz.timezone("Europe/Moscow")
+access_time = datetime.now(moscow_tz).strftime('%Y-%m-%d %H:%M:%S')
 
 def check_ip_details(ip):
     api_key = '4NCSuXALgoQMCfExLttNTPQVnyD2h3cf'
@@ -13,7 +17,8 @@ def check_ip_details(ip):
         return response.json()
     except Exception as e:
         return {"error": str(e)}
-        
+
+# Определение типа устройства
 def detect_device_type(user_agent):
     ua = user_agent.lower()
     if 'tablet' in ua or 'ipad' in ua:
@@ -24,25 +29,29 @@ def detect_device_type(user_agent):
 
 @app.route('/')
 def index():
+    # Получение IP
     x_forwarded_for = request.headers.get('X-Forwarded-For')
     if x_forwarded_for:
         visitor_ip = x_forwarded_for.split(',')[0].strip()
     else:
         visitor_ip = request.remote_addr
 
+    # Заголовки запроса
     user_agent = request.headers.get('User-Agent', 'Unknown')
     referer = request.headers.get('Referer', 'None')
     cookies = request.headers.get('Cookie', 'None')
-    access_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-    device_type = detect_device_type(user_agent)
 
+
+    # Устройство и IP-информация
+    device_type = detect_device_type(user_agent)
     ip_info = check_ip_details(visitor_ip)
     vpn_status = ip_info.get("vpn", "unknown")
     proxy_status = ip_info.get("proxy", "unknown")
     tor_status = ip_info.get("tor", "unknown")
 
+    # Формируем лог
     log_entry = (
-        f"Time: {access_time}\n"
+        f"Time (Moscow): {access_time}\n"
         f"IP: {visitor_ip}\n"
         f"VPN: {vpn_status}\n"
         f"Proxy: {proxy_status}\n"
@@ -56,7 +65,10 @@ def index():
 
     print(log_entry)
 
+    # Сохраняем лог в файл
     with open("ip_log.txt", "a") as f:
         f.write(log_entry)
 
     return "Шо ты голова."
+
+# Gunicorn сам запустит `app`, ничего не нужно ниже
