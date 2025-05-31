@@ -8,9 +8,12 @@ app = Flask(__name__)
 def check_ip_details(ip):
     api_key = '4NCSuXALgoQMCfExLttNTPQVnyD2h3cf'
     url = f'https://ipqualityscore.com/api/json/ip/{api_key}/{ip}'
-    response = requests.get(url)
-    return response.json()
-
+    try:
+        response = requests.get(url)
+        return response.json()
+    except Exception as e:
+        return {"error": str(e)}
+        
 def detect_device_type(user_agent):
     ua = user_agent.lower()
     if 'tablet' in ua or 'ipad' in ua:
@@ -33,15 +36,23 @@ def index():
     access_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
     device_type = detect_device_type(user_agent)
 
+ip_info = check_ip_details(visitor_ip)
+
+vpn_status = ip_info.get("vpn", "unknown")
+proxy_status = ip_info.get("proxy", "unknown")
+tor_status = ip_info.get("tor", "unknown")
+
     log_entry = (
         f"Time: {access_time}\n"
         f"IP: {visitor_ip}\n"
+        f"VPN: {vpn_status}\n"
+        f"Proxy: {proxy_status}\n"
+        f"TOR: {tor_status}\n"
         f"Device Type: {device_type}\n"
         f"User-Agent: {user_agent}\n"
         f"Referer: {referer}\n"
         f"Cookies: {cookies}\n"
-        f"X-Forwarded-For: {x_forwarded_for if x_forwarded_for else 'None'}\n\n"
-    )
+        f"X-Forwarded-For: {x_forwarded_for if x_forwarded_for else 'None'}\n\n"    )
 
     print(log_entry)
 
