@@ -6,7 +6,7 @@ import requests
 app = Flask(__name__)
 
 def check_ip_details(ip):
-    api_key = 'YOUR_API_KEY'
+    api_key = '4NCSuXALgoQMCfExLttNTPQVnyD2h3cf'
     url = f'https://ipqualityscore.com/api/json/ip/{api_key}/{ip}'
     response = requests.get(url)
     return response.json()
